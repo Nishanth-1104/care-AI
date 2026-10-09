@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care AI - Healthcare Chatbot</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <div class="chatbot-container">
+
+        <div class="chat-header">
+
+            <div class="profile">
+             <div class="avatar">🤖</div>
+
+                <div class="profile-info">
+                <h1>CAREAI</h1>
+                <p>🟢 Online</p>
+            </div>
+        </div>
+
+        <div class="subtitle">
+           Your AI Companion for Health Awareness & Safety
+        </div>
+        <button class="clear-btn" onclick="clearChat()">🗑️ Clear Chat</button>
+
+    </div>
+    <div class="disclaimer">
+        ⚠️ CAREAI provides general health awareness information.
+        It is not a substitute for professional medical advice.
+        For emergencies, contact local emergency services.
+    </div>
+    <div class="categories">
+        <button onclick="quickMessage('Health')">🩺 Health</button>
+        <button onclick="quickMessage('First Aid')">🚑 First Aid</button>
+        <button onclick="quickMessage('Lifestyle')">🥗 Lifestyle</button>
+        <button onclick="quickMessage('Prevention')">🛡️ Prevention</button>
+    </div>
+    <div class="suggestions">
+     <p>💡 Try asking:</p>
+
+        <button onclick="quickMessage('What are healthy habits?')">
+            Healthy habits
+        </button>
+
+        <button onclick="quickMessage('What should I do for a minor burn?')">
+            Minor burn
+        </button>
+
+        <button onclick="quickMessage('I have a headache')">
+            Headache
+        </button>
+
+        <button onclick="quickMessage('How can I prevent illness?')">
+            Prevention
+        </button>
+    </div>
+    <div class="chat-box" id="chatBox">
+        <div class="bot-message">
+
+            Hello! 👋 I'm CAREAI.<br>
+            I'm here to help with health awareness, basic first aid,
+            healthy habits, and prevention tips. 💚<br><br>
+            How can I help you today?
+        </div>
+    </div>
+    <div class="footer">
+      CAREAI • Health Awareness & First-Aid Assistant
+    </div>
+
+    <div class="input-area">
+        <input
+            type="text"
+            id="userInput"
+            placeholder="Type your health related question...."
+         >
+            <button onclick="startVoice()">🎤</button>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script src="./script.js" type="text/javascript"></script>
+
+ 
+</body>
+</html>
