@@ -1,56 +1,127 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+import requests
 
 app = Flask(__name__)
+CORS(app)
+
+OLLAMA_URL = "http://localhost:11434/api/chat"
+MODEL_NAME = "llama3.2:1b"
+
+SYSTEM_PROMPT = """
+You are CAREAI, an AI companion for general health awareness,
+basic first-aid education, healthy habits, and illness prevention.
+
+Rules:
+1. Use simple, friendly English and clear, practical explanations.
+2. Understand natural questions, even when phrased differently.
+3. Do not claim to diagnose a disease or replace a healthcare professional.
+4. Do not prescribe medicines or invent medicine dosages.
+5. If information is insufficient, ask a brief clarifying question.
+6. For severe or sudden symptoms, recommend urgent medical evaluation.
+7. For signs of a life-threatening emergency, tell the user to contact
+   local emergency services immediately.
+8. For burns, explain basic first aid and when emergency care is needed.
+9. Be calm, respectful, concise, and avoid frightening the user.
+10. Never claim that you have examined or diagnosed the user.
+11. If unsure, say so instead of making up medical facts.
+12. Give general educational information, not a definitive diagnosis.
+"""
+
+EMERGENCY_KEYWORDS = [
+    "unconscious",
+    "not breathing",
+    "can't breathe",
+    "cannot breathe",
+    "difficulty breathing",
+    "chest pain",
+    "heavy bleeding",
+    "severe bleeding",
+    "overdose",
+    "suicide attempt",
+    "seizure",
+    "stroke symptoms"
+]
 
 
 def careai_response(message):
     message = message.lower().strip()
 
-    if "hello" in message or "hi" in message:
-        return "Hello! 👋 I'm CAREAI. How can I help you?"
+    # Immediate safety check before calling the AI.
+    if any(term in message for term in EMERGENCY_KEYWORDS):
+        return (
+            "🚨 Your symptoms may indicate an emergency. "
+            "Please contact your local emergency services immediately. "
+            "Do not delay urgent care while chatting with CAREAI. "
+            "If possible, ask someone nearby to help."
+        )
 
-    elif "fever" in message:
-        return "Fever can happen for many reasons. Stay hydrated, rest, and monitor your symptoms. If symptoms are severe or persistent, seek medical care."
+    try:
+        result = requests.post(
+            OLLAMA_URL,
+            json={
+                "model": MODEL_NAME,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": message
+                    }
+                ],
+                "stream": False,
+                "options": {
+                    "temperature": 0.3,
+                    "num_predict": 250
+                }
+            },
+            timeout=(5, 90)
+        )
 
-    elif "headache" in message:
-        return "For a mild headache, try resting and drinking enough water. If the headache is sudden, severe, or unusual, seek medical attention."
+        result.raise_for_status()
+        data = result.json()
 
-    elif "burn" in message:
-        return "For a minor burn, cool the area under clean running water for about 20 minutes. Do not apply ice directly. Serious burns need medical attention."
+        answer = data.get("message", {}).get("content", "").strip()
 
-    elif "water" in message or "hydration" in message:
-        return "💧 Staying hydrated is important. Drink water regularly, especially during hot weather or physical activity."
+        if answer:
+            return answer
 
-    elif "healthy" in message or "lifestyle" in message or "healthy habits" in message:
-        return "🥗 Eat nutritious food, stay active, drink enough water, sleep well, and maintain good hygiene."
+        raise ValueError("Ollama returned an empty answer")
 
-    elif "prevention" in message:
-        return "🛡️ Regular handwashing, good hygiene, nutritious food, physical activity, and recommended preventive healthcare can help reduce health risks."
-    elif "cold" in message:
-        return "For a mild cold, get enough rest, drink fluids, and monitor your symptoms. Seek medical care if symptoms become severe or persistent."
+    except (requests.RequestException, ValueError) as error:
+        app.logger.warning("Ollama request failed: %s", error)
 
-    elif "cough" in message:
-        return "For a mild cough, stay hydrated and rest. If you have difficulty breathing, chest pain, or a persistent severe cough, seek medical care."
+        # Basic fallback if the local AI is unavailable.
+        if "burn" in message:
+            return (
+                "For a minor thermal burn, cool the area under "
+                "cool running water for 20 minutes. Do not apply "
+                "ice, butter, or creams. Seek urgent medical care "
+                "for serious burns."
+            )
 
-    elif "stomach pain" in message or "stomach" in message:
-        return "For mild stomach discomfort, stay hydrated and eat light foods. If the pain is severe or persistent, seek medical care."
-    
-    elif "emergency" in message or "unconscious" in message:
-        return "🚨 This may be an emergency. Contact your local emergency services immediately and stay with the person if it is safe to do so."
+        if "fever" in message:
+            return (
+                "Fever can have many causes. Rest, drink fluids, "
+                "and monitor your symptoms. Seek medical advice "
+                "if symptoms worsen, persist, or concern you."
+            )
 
-    elif "bleeding" in message:
-        return "🩹 Apply firm, steady pressure with clean cloth or gauze to control bleeding. If bleeding is heavy or does not stop, seek emergency medical help."
+        if "headache" in message:
+            return (
+                "For a mild headache, rest and drink water. "
+                "Seek urgent medical care for a sudden, extremely "
+                "severe headache or one with new neurological symptoms."
+            )
 
-    elif "choking" in message:
-        return "🚨 Choking can be life-threatening. If the person cannot breathe or speak, seek emergency help immediately."
-
-    elif "nosebleed" in message:
-        return "For a nosebleed, sit upright, lean slightly forward, and gently pinch the soft part of the nose for about 10–15 minutes. Seek medical care if bleeding continues."
-
-    elif "sprain" in message:
-        return "For a mild sprain, rest the area and use a wrapped cold pack for short periods. If there is severe pain, deformity, or inability to use the limb, seek medical care."
-    else:
-        return "I'm still learning! 🤖 Please ask me about fever, headache, burns, hydration, healthy habits, or prevention."
+        return (
+            "CAREAI's local AI is temporarily unavailable. "
+            "Please make sure Ollama is running and the selected "
+            "model is installed, then try again. For urgent health "
+            "concerns, contact a healthcare professional."
+        )
 
 
 @app.route("/")
@@ -65,15 +136,26 @@ def files(filename):
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
-
+    data = request.get_json(silent=True) or {}
     user_message = data.get("message", "")
+
+    if not isinstance(user_message, str):
+        return jsonify({"response": "Please enter a valid text question."}), 400
+
+    user_message = user_message.strip()
+
+    if not user_message:
+        return jsonify({"response": "Please type a question for CAREAI."}), 400
+
+    if len(user_message) > 2000:
+        return jsonify({
+            "response": "Please keep your question under 2000 characters."
+        }), 400
 
     response = careai_response(user_message)
 
-    return jsonify({
-        "response": response
-    })
+    # Preserve the JSON format expected by your existing script.js.
+    return jsonify({"response": response})
 
 
 if __name__ == "__main__":
