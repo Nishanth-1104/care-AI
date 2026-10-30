@@ -1,88 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Care AI - Healthcare Chatbot</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
-    <link rel="stylesheet" href="style.css">
-    
-</head>
-<body>
-    <div class="chatbot-container">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CAREAI offers general health awareness and first-aid information." />
+    <meta name="theme-color" content="#f5f7f8" />
+    <title>CAREAI — Your health companion</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="CAREAI navigation">
+        <a class="brand" href="#" aria-label="CAREAI home">
+          <span class="brand-mark" aria-hidden="true">+</span>
+          <span>care<span class="brand-accent">ai</span></span>
+        </a>
 
-        <div class="chat-header">
+        <button class="new-chat-button" type="button" onclick="clearChat()">
+          <span aria-hidden="true">＋</span>
+          New conversation
+        </button>
 
-            <div class="profile">
-             <div class="avatar">🤖</div>
-
-                <div class="profile-info">
-                <h1>CAREAI</h1>
-                <p>🟢 Online</p>
-            </div>
-        </div>
-
-        <div class="subtitle">
-           Your AI Companion for Health Awareness & Safety
-        </div>
-        <button class="clear-btn" onclick="clearChat()">🗑️ Clear Chat</button>
-
-    </div>
-    <div class="disclaimer">
-        ⚠️ CAREAI provides general health awareness information.
-        It is not a substitute for professional medical advice.
-        For emergencies, contact local emergency services.
-    </div>
-    <div class="categories">
-        <button onclick="quickMessage('Health')">🩺 Health</button>
-        <button onclick="quickMessage('First Aid')">🚑 First Aid</button>
-        <button onclick="quickMessage('Lifestyle')">🥗 Lifestyle</button>
-        <button onclick="quickMessage('Prevention')">🛡️ Prevention</button>
-    </div>
-    <div class="suggestions">
-     <p>💡 Try asking:</p>
-
-        <button onclick="quickMessage('What are healthy habits?')">
+        <div class="sidebar-section">
+          <p class="sidebar-label">YOUR HEALTH, YOUR WAY</p>
+          <button class="topic-link" type="button" onclick="quickMessage('I have a question about my health')">
+            <span class="topic-icon topic-icon-mint" aria-hidden="true">✳</span>
+            General health
+          </button>
+          <button class="topic-link" type="button" onclick="quickMessage('What should I know about basic first aid?')">
+            <span class="topic-icon topic-icon-peach" aria-hidden="true">＋</span>
+            First aid
+          </button>
+          <button class="topic-link" type="button" onclick="quickMessage('How can I build healthier daily habits?')">
+            <span class="topic-icon topic-icon-blue" aria-hidden="true">♡</span>
             Healthy habits
-        </button>
-
-        <button onclick="quickMessage('What should I do for a minor burn?')">
-            Minor burn
-        </button>
-
-        <button onclick="quickMessage('I have a headache')">
-            Headache
-        </button>
-
-        <button onclick="quickMessage('How can I prevent illness?')">
+          </button>
+          <button class="topic-link" type="button" onclick="quickMessage('How can I help prevent common illnesses?')">
+            <span class="topic-icon topic-icon-lilac" aria-hidden="true">⌁</span>
             Prevention
-        </button>
-    </div>
-    <div class="chat-box" id="chatBox">
-        <div class="bot-message">
-
-            Hello! 👋 I'm CAREAI.<br>
-            I'm here to help with health awareness, basic first aid,
-            healthy habits, and prevention tips. 💚<br><br>
-            How can I help you today?
+          </button>
         </div>
-    </div>
-    <div class="footer">
-      CAREAI • Health Awareness & First-Aid Assistant
-    </div>
 
-    <div class="input-area">
-        <input
-            type="text"
-            id="userInput"
-            placeholder="Type your health related question...."
-         >
-            <button onclick="startVoice()">🎤</button>
-            <button onclick="sendMessage()">Send</button>
+        <div class="sidebar-bottom">
+          <div class="privacy-note">
+            <span class="privacy-icon" aria-hidden="true">✦</span>
+            <p>
+              <strong>A thoughtful place to start</strong>
+              Get clear, general health information in a supportive space.
+            </p>
+          </div>
+          <div class="sidebar-user">
+            <div class="user-avatar" aria-hidden="true">Y</div>
+            <div>
+              <strong>Your health companion</strong>
+              <span>Here to help you learn</span>
+            </div>
+          </div>
         </div>
-    </div>
-    <script src="./script.js" type="text/javascript"></script>
+      </aside>
 
- 
-</body>
+      <main class="main-panel">
+        <header class="topbar">
+          <div class="assistant-identity">
+            <div class="assistant-avatar" aria-hidden="true">
+              <span>✦</span>
+            </div>
+            <div>
+              <p class="assistant-name">CAREAI</p>
+              <p class="assistant-caption">Your health companion</p>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <span class="guidance-badge">
+              <span class="status-dot" aria-hidden="true"></span>
+              General guidance
+            </span>
+            <button
+              class="icon-button clear-button"
+              type="button"
+              onclick="clearChat()"
+              aria-label="Clear conversation"
+              title="Clear conversation"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <section class="conversation" aria-label="Conversation">
+          <div class="welcome-panel" id="welcomePanel">
+            <div class="welcome-orbit" aria-hidden="true">
+              <div class="welcome-orbit-inner">✦</div>
+              <span class="orbit-sparkle sparkle-one">✧</span>
+              <span class="orbit-sparkle sparkle-two">✦</span>
+            </div>
+            <p class="eyebrow">A LITTLE MORE CLARITY, A LITTLE MORE CARE</p>
+            <h1>How can I help<br />you feel better informed?</h1>
+            <p class="welcome-copy">
+              Ask me about everyday health, first aid, or healthy habits. We’ll take it one step at a time.
+            </p>
+
+            <div class="suggestion-grid" aria-label="Suggested questions">
+              <button
+                class="suggestion-card"
+                type="button"
+                onclick="quickMessage('What are a few healthy habits I can start today?')"
+              >
+                <span class="suggestion-icon mint-icon" aria-hidden="true">✳</span>
+                <span>
+                  <strong>Everyday wellness</strong>
+                  <small>Simple habits for feeling your best</small>
+                </span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+              <button
+                class="suggestion-card"
+                type="button"
+                onclick="quickMessage('What should I do for a minor burn?')"
+              >
+                <span class="suggestion-icon peach-icon" aria-hidden="true">＋</span>
+                <span>
+                  <strong>First-aid basics</strong>
+                  <small>Practical steps for common situations</small>
+                </span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+              <button
+                class="suggestion-card"
+                type="button"
+                onclick="quickMessage('How can I prevent common illnesses?')"
+              >
+                <span class="suggestion-icon blue-icon" aria-hidden="true">⌁</span>
+                <span>
+                  <strong>Staying well</strong>
+                  <small>Learn about prevention and healthy routines</small>
+                </span>
+                <span class="card-arrow" aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="chat-box" id="chatBox" aria-live="polite"></div>
+        </section>
+
+        <footer class="composer-area">
+          <div class="disclaimer">
+            <span aria-hidden="true">ⓘ</span>
+            CAREAI shares general information and isn’t a substitute for professional medical advice.
+            <strong>In an emergency, contact local emergency services.</strong>
+          </div>
+          <div class="input-area">
+            <input
+              type="text"
+              id="userInput"
+              aria-label="Your health question"
+              placeholder="Ask CAREAI anything about your health..."
+              autocomplete="off"
+            />
+            <button
+              class="voice-button"
+              type="button"
+              onclick="startVoice()"
+              aria-label="Use voice input"
+              title="Use voice input"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <rect x="9" y="3" width="6" height="12" rx="3" />
+                <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" />
+              </svg>
+            </button>
+            <button class="send-button" type="button" onclick="sendMessage()" aria-label="Send message">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          <p class="composer-hint">CAREAI can make mistakes. Please verify important information.</p>
+        </footer>
+      </main>
+    </div>
+    <script src="./script.js"></script>
+  </body>
 </html>
